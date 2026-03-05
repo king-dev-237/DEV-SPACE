@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TTSET GLOBAL LTD</title>
+
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<header>
+  <nav class="nav">
+    <h2 class="logo">TTSET GLOBAL</h2>
+
+    <ul>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#training">Training</a></li>
+      <li><a href="#internships">Internships</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Driving Innovation Through <span class="intel">Intelligence</span></h1>
+    <p>Your global partner for AI, Cyber Security, and Professional Tech Development.</p>
+
+    <div class="buttons">
+      <a href="#contact" class="btn primary">Contact Us</a>
+      <a href="#internships" class="btn">Apply for Internship</a>
+      <a href="#training" class="btn">Enroll for Training</a>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="section">
+  <h2>Our Professional Services</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Digital Marketing</h3>
+      <p>Advanced SEO, PPC, and data-driven advertising strategies.</p>
+    </div>
+
+    <div class="card">
+      <h3>Graphic Design</h3>
+      <p>Creative visual identities and high-impact UI/UX designs.</p>
+    </div>
+
+    <div class="card">
+      <h3>BI & Data Analytics</h3>
+      <p>Transforming raw data into actionable business intelligence.</p>
+    </div>
+
+    <div class="card">
+      <h3>Cyber Security</h3>
+      <p>Enterprise-grade threat protection and vulnerability assessment.</p>
+    </div>
+
+    <div class="card">
+      <h3>AI & Machine Learning</h3>
+      <p>Custom neural networks and automation solutions.</p>
+    </div>
+
+    <div class="card">
+      <h3>Full Stack Development</h3>
+      <p>Scalable web and mobile applications built for performance.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TRAINING -->
+<section id="training" class="section dark">
+  <h2>Professional Training</h2>
+
+  <form action="https://formspree.io/f/xreagbek" method="post" class="form" id="trainingForm">
+    <div class="form-grid">
+      <div class="form-row">
+        <label for="training-name">Full Name</label>
+        <input id="training-name" type="text" name="name" placeholder="Your full name" required>
+      </div>
+
+      <div class="form-row">
+        <label for="training-email">Email</label>
+        <input id="training-email" type="email" name="email" placeholder="you@example.com" required>
+      </div>
+
+      <div class="form-row">
+        <label for="training-phone">Phone</label>
+        <input id="training-phone" type="tel" name="phone" placeholder="Optional">
+      </div>
+
+      <div class="form-row">
+        <label for="training-program">Program</label>
+        <select id="training-program" name="program" required>
+          <option value="">Select Program...</option>
+          <option>Master’s Analytics Track</option>
+          <option>Security Specialist</option>
+          <option>Modern Full Stack</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn primary">Register Interest</button>
+    </div>
+  </form>
+</section>
+
+<!-- INTERNSHIP -->
+<section id="internships" class="section">
+  <h2>Global Internship Programs</h2>
+  <form action="https://formspree.io/f/xreagbek" method="POST" class="lead-form">
+
+                <input type="hidden" name="lead_type" value="Internship Application">
+                <input type="hidden" name="_subject" value="New Internship Application - TTSET GLOBAL">
+
+                <input type="text" name="name" placeholder="Full Name" required="">
+                <input type="email" name="email" placeholder="Email Address" required="">
+
+                <select name="internship_type" required="">
+<option value="student">Student Track</option>
+<option value="professional">Professional Track</option>
+</select>
+
+                <button type="submit" class="btn primary">
+Apply Now
+</button>
+            </form>
+  
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="section dark">
+  <h2>Service Inquiry</h2>
+
+  <form action="https://formspree.io/f/xreagbek" method="POST" class="form lead-form dark-form" id="contactForm">
+    <input type="hidden" name="lead_type" value="Service Inquiry">
+    <input type="hidden" name="_subject" value="New Service Inquiry - TTSET GLOBAL">
+
+    <div class="form-grid">
+      <div class="form-row">
+        <label for="contact-name">Full Name</label>
+        <input id="contact-name" type="text" name="name" placeholder="Your name" required>
+      </div>
+
+      <div class="form-row">
+        <label for="contact-email">Email</label>
+        <input id="contact-email" type="email" name="email" placeholder="Business email" required>
+      </div>
+
+      <div class="form-row">
+        <label for="contact-service">Service</label>
+        <select id="contact-service" name="service_interest" required>
+          <option value="marketing">Digital Marketing</option>
+          <option value="dev">Full Stack Development</option>
+          <option value="cyber">Cyber Security</option>
+          <option value="bi">Business Intelligence</option>
+        </select>
+      </div>
+
+      <div class="form-row form-full">
+        <label for="contact-message">Message</label>
+        <textarea id="contact-message" name="message" rows="5" placeholder="How can we help?"></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn primary">Send Message</button>
+    </div>
+  </form>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <h3>TTSET GLOBAL LTD</h3>
+  <p>Leading the digital transformation era.</p>
+  <p>Email: info@ttsetglobal.com</p>
+  <p>Phone: +237 652 223 725</p>
+  <p>© 2026 TTSET GLOBAL LTD</p>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
