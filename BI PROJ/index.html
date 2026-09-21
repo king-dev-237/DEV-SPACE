@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Northstar BI | Sales intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark"><i data-lucide="sparkles"></i></span><span>northstar<span class="brand-dot">.</span></span></div>
+      <div class="workspace-switcher"><div class="workspace-avatar">AC</div><div><strong>Acme Corp</strong><small>Revenue workspace</small></div><i data-lucide="chevrons-up-down"></i></div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <p class="nav-label">Workspace</p>
+        <button class="nav-item active" data-view="overview"><i data-lucide="layout-dashboard"></i>Overview</button>
+        <button class="nav-item" data-view="customers"><i data-lucide="users"></i>Customers<span class="nav-count">248</span></button>
+        <button class="nav-item" data-view="products"><i data-lucide="package-2"></i>Products</button>
+        <button class="nav-item" data-view="reports"><i data-lucide="file-bar-chart-2"></i>Reports</button>
+        <p class="nav-label nav-label-spaced">Manage</p>
+        <button class="nav-item" data-view="data"><i data-lucide="database"></i>Data sources</button>
+        <button class="nav-item" data-view="settings"><i data-lucide="settings-2"></i>Settings</button>
+      </nav>
+      <div class="sidebar-bottom"><div class="help-box"><div class="help-icon"><i data-lucide="message-circle-question"></i></div><strong>Need a hand?</strong><span>Visit our help center</span><button>Go to help center <i data-lucide="arrow-up-right"></i></button></div><div class="profile"><div class="profile-avatar">JD</div><div><strong>Jordan Davis</strong><small>Admin</small></div><i data-lucide="more-horizontal"></i></div></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar"><div class="breadcrumbs"><span>Workspace</span><i data-lucide="chevron-right"></i><strong>Overview</strong></div><div class="top-actions"><button class="icon-button" aria-label="Search"><i data-lucide="search"></i></button><button class="icon-button notification" aria-label="Notifications"><i data-lucide="bell"></i><span></span></button><button class="avatar-button">JD</button></div></header>
+      <div class="page-content" id="pageContent">
+        <section class="page-heading"><div><p class="eyebrow">Monday, 21 September 2026</p><h1>Good morning, Jordan <span>✦</span></h1><p class="subtitle">Here’s what’s happening with your revenue today.</p></div><div class="heading-actions"><label class="date-select"><i data-lucide="calendar-days"></i><select id="periodSelect"><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="365">This year</option></select><i data-lucide="chevron-down"></i></label><button class="button button-dark" id="exportBtn"><i data-lucide="download"></i>Export report</button></div></section>
+        <div class="insight-strip"><div class="insight-symbol"><i data-lucide="lightbulb"></i></div><div><strong>Revenue is pacing ahead of plan</strong><span>You're 8.4% above your monthly target. Keep an eye on EMEA — it has softened for two weeks.</span></div><button class="strip-action" id="insightBtn">View insight <i data-lucide="arrow-up-right"></i></button><button class="strip-close" aria-label="Dismiss insight"><i data-lucide="x"></i></button></div>
+        <section class="metric-grid" id="metricGrid"></section>
+        <section class="main-grid">
+          <article class="panel revenue-panel"><div class="panel-heading"><div><h2>Revenue performance</h2><p>Net revenue over time · FCFA</p></div><div class="legend"><span><i class="legend-dot teal"></i>Revenue</span><span><i class="legend-line"></i>Target</span></div></div><div class="chart-wrap"><div class="y-axis"><span>0 FCFA</span><span>0 FCFA</span><span>0 FCFA</span><span>0 FCFA</span><span>0 FCFA</span></div><div class="chart-area"><div class="grid-lines"><i></i><i></i><i></i><i></i><i></i></div><svg class="revenue-chart" viewBox="0 0 700 240" preserveAspectRatio="none" aria-label="Revenue chart"><defs><linearGradient id="areaFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#0b8f81" stop-opacity=".23"/><stop offset="100%" stop-color="#0b8f81" stop-opacity="0"/></linearGradient></defs><path class="target-path" d="M0 167 C50 159 78 164 112 145 S177 151 205 133 S270 142 300 117 S357 132 390 105 S455 118 483 89 S550 102 584 77 S650 88 700 55"/><path class="area-path" d="M0 181 C50 177 78 189 112 157 S177 175 205 144 S270 153 300 129 S357 144 390 111 S455 129 483 97 S550 105 584 72 S650 86 700 40 L700 240 L0 240 Z"/><path class="line-path" d="M0 181 C50 177 78 189 112 157 S177 175 205 144 S270 153 300 129 S357 144 390 111 S455 129 483 97 S550 105 584 72 S650 86 700 40"/><circle cx="700" cy="40" r="5" class="last-point"/></svg><div class="x-axis"><span>Aug 22</span><span>Aug 29</span><span>Sep 05</span><span>Sep 12</span><span>Sep 21</span></div></div></div></article>
+          <article class="panel channel-panel"><div class="panel-heading"><div><h2>Revenue by channel</h2><p>Contribution to total revenue · FCFA</p></div><button class="more-button" aria-label="More options"><i data-lucide="more-horizontal"></i></button></div><div class="donut-row"><div class="donut"><div class="donut-center"><strong>0 FCFA</strong><span>Total revenue</span></div></div><div class="channel-list" id="channelList"></div></div><div class="channel-footer"><span><i data-lucide="trending-up"></i> 0.0% <small>vs last period</small></span><button>View breakdown <i data-lucide="arrow-right"></i></button></div></article>
+        </section>
+        <section class="lower-grid"><article class="panel customers-panel"><div class="panel-heading"><div><h2>Top customers</h2><p>Highest value accounts this period</p></div><button class="text-button" data-view="customers">View all <i data-lucide="arrow-up-right"></i></button></div><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Orders</th><th>Revenue</th><th>Growth</th><th></th></tr></thead><tbody id="customerTable"></tbody></table></div></article><article class="panel activity-panel"><div class="panel-heading"><div><h2>Recent activity</h2><p>Latest data and team updates</p></div><button class="more-button" aria-label="More options"><i data-lucide="more-horizontal"></i></button></div><div class="activity-list"><div class="activity-item"><div class="activity-avatar teal-bg"><i data-lucide="file-up"></i></div><div><strong>Sales data imported</strong><span>Q3_sales_data.csv · 2,184 rows</span></div><time>12m</time></div><div class="activity-item"><div class="activity-avatar yellow-bg"><i data-lucide="circle-dollar-sign"></i></div><div><strong>Target updated</strong><span>September target set to $310,000</span></div><time>2h</time></div><div class="activity-item"><div class="activity-avatar blue-bg"><i data-lucide="user-plus"></i></div><div><strong>New customer segment</strong><span>“Enterprise expansion” created</span></div><time>5h</time></div><div class="activity-item"><div class="activity-avatar coral-bg"><i data-lucide="file-text"></i></div><div><strong>Weekly report generated</strong><span>Shared with 4 stakeholders</span></div><time>1d</time></div></div><button class="activity-footer">See all activity <i data-lucide="arrow-right"></i></button></article></section>
+        <section class="upload-prompt"><div class="upload-graphic"><i data-lucide="upload-cloud"></i></div><div><h2>Bring in your latest data</h2><p>Upload a CSV to refresh your dashboard. We’ll map your columns automatically.</p></div><label class="button button-light"><i data-lucide="upload"></i>Import CSV<input type="file" id="fileInput" accept=".csv,text/csv" hidden></label><span class="upload-hint">Last synced 12 minutes ago</span></section>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast"><i data-lucide="check-circle-2"></i><span></span></div>
+  <script src="script.js"></script>
+</body>
+</html>
