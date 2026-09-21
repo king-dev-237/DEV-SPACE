@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>UBC | USSD Engine - Admin Dashboard</title>
+    <link rel="icon" href="/web/images/ussd-ubc-logo.png" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+
+    <style>
+        /* -------------------------
+           Base / Reset
+           ------------------------- */
+        :root {
+            --bg: #f4f6f9;
+            --card: #ffffff;
+            --muted: #6b7280;
+            --accent: #0ea5a4;
+            --danger: #ef4444;
+            --sidebar: #0f1724;
+            --glass: rgba(255, 255, 255, 0.6);
+            --radius: 10px;
+            --shadow: 0 6px 18px rgba(15, 23, 36, 0.08);
+            --max-width: 1200px;
+            --gap: 18px;
+            --transition: 200ms ease;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html, body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(180deg, #eef2f7 0%, var(--bg) 100%);
+            color: #0b1220;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.4;
+        }
+
+        /* -------------------------
+           Layout
+           ------------------------- */
+        .app {
+            display: flex;
+            min-height: 100vh;
+            gap: var(--gap);
+            padding: 20px;
+            max-width: calc(var(--max-width) + 40px);
+            margin: 0 auto;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, var(--sidebar), #0b1220);
+            color: #fff;
+            border-radius: var(--radius);
+            padding: 20px;
+            flex-shrink: 0;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .brand {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .brand .logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: var(--glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--sidebar);
+            font-weight: 700;
+        }
+
+        .brand h1 {
+            font-size: 16px;
+            margin: 0
+        }
+
+        .nav {
+            margin-top: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .nav button {
+            background: transparent;
+            border: 0;
+            color: inherit;
+            text-align: left;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .nav button.active, .nav button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+        }
+
+        .sidebar .footer {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Main content */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap);
+        }
+
+        header.topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: var(--card);
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .search {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: #f8fafc;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #eef2f6;
+        }
+
+        .search input {
+            border: 0;
+            background: transparent;
+            outline: none;
+            width: 220px
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        /* Content container */
+        .container {
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap);
+        }
+
+        /* Cards grid */
+        .grid {
+            display: grid;
+            grid-template-columns:repeat(4, 1fr);
+            gap: var(--gap);
+        }
+
+        .card {
+            background: var(--card);
+            padding: 14px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            min-height: 80px;
+        }
+
+        .card .title {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 8px
+        }
+
+        .card .value {
+            font-size: 20px;
+            font-weight: 700
+        }
+
+        /* Charts & panels */
+        .panel {
+            background: var(--card);
+            padding: 14px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eef2f6;
+            font-size: 13px
+        }
+
+        th {
+            background: transparent;
+            color: var(--muted);
+            font-weight: 700
+        }
+
+        tr:hover td {
+            background: linear-gradient(90deg, rgba(14, 165, 164, 0.03), transparent)
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        .btn {
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 0;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn.ghost {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid rgba(14, 165, 164, 0.12)
+        }
+
+        .btn.danger {
+            background: var(--danger)
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1100px) {
+            .grid {
+                grid-template-columns:repeat(2, 1fr)
+            }
+
+            .sidebar {
+                width: 220px
+            }
+        }
+
+        @media (max-width: 760px) {
+            .app {
+                flex-direction: column;
+                padding: 12px
+            }
+
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                align-items: center;
+                padding: 10px;
+                gap: 10px;
+                border-radius: 10px
+            }
+
+            .nav {
+                flex-direction: row;
+                gap: 6px;
+                overflow: auto
+            }
+
+            .main {
+                width: 100%
+            }
+
+            .grid {
+                grid-template-columns:1fr
+            }
+
+            .search input {
+                width: 120px
+            }
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 60
+        }
+
+        .modal {
+            background: var(--card);
+            padding: 18px;
+            border-radius: 12px;
+            max-width: 720px;
+            width: 100%;
+            box-shadow: var(--shadow)
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px
+        }
+
+        .form-row input, .form-row select, textarea {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e6eef6;
+            background: #fbfdff
+        }
+
+        .small {
+            width: 140px
+        }
+
+        /* Tiny helpers */
+        .muted {
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 6px 8px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            font-weight: 600;
+            font-size: 12px
+        }
+
+        .flex {
+            display: flex;
+            gap: 10px;
+            align-items: center
+        }
+
+        .right {
+            margin-left: auto
+        }
+
+        .nowrap {
+            white-space: nowrap
+        }
+    </style>
+</head>
+<body>
+<div hidden>
+    <h1>Data from API</h1>
+    <pre>{{ api_data | tojson(indent=2) }}</pre>
+</div>
+<div class="app" id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" aria-label="Main navigation">
+        <div class="brand">
+            <div class="logo">US</div>
+            <div>
+                <h1>USSD Admin</h1>
+                <div class="muted" style="font-size:12px">Operations Console</div>
+            </div>
+        </div>
+
+        <nav class="nav" role="navigation" aria-label="Dashboard sections">
+            <button class="active" data-section="overview" onclick="ui.showSection('overview')">Overview</button>
+            <button data-section="transactions" onclick="ui.showSection('transactions')">Transaction Logs</button>
+            <button data-section="api" onclick="ui.showSection('api')">API Monitoring</button>
+            <button data-section="users" onclick="ui.showSection('users')">Users & Roles</button>
+            <button data-section="audit" onclick="ui.showSection('audit')">Audit Trails</button>
+        </nav>
+
+        <div class="footer">
+            <div style="margin-bottom:6px">Signed in as <strong>{{userLogin}}</strong></div>
+            <div style="font-size:12px">Version <span class="pill">1.0.0</span></div>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+        <!-- Topbar -->
+        <header class="topbar" role="banner">
+            <div class="flex">
+                <div class="search" role="search" aria-label="Search transactions or users">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="opacity:.6">
+                        <path d="M21 21l-4.35-4.35" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round"
+                              stroke-linejoin="round"/>
+                        <circle cx="11" cy="11" r="6" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round"/>
+                    </svg>
+                    <input id="globalSearch" placeholder="Search transactions, users, agencies..."
+                           oninput="ui.onSearch(this.value)"/>
+                </div>
+                <div class="muted" style="margin-left:8px">Last 30 days</div>
+            </div>
+
+            <div class="top-actions">
+                <div class="muted">Notifications</div>
+                <button class="btn ghost" onclick="ui.openModal('createUser')">+ New User</button>
+                <button class="btn" onclick="ui.openModal('createTransaction')">+ New Txn</button>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <section class="container" id="content">
+
+            <!-- Overview -->
+            <div id="overview" class="page">
+                <div class="grid" aria-hidden="false">
+                    <div class="card">
+                        <div class="title">Total Users</div>
+                        <div class="value" id="statUsers">—</div>
+                        <div class="muted">Active / Registered</div>
+                    </div>
+                    <div class="card">
+                        <div class="title">Canals</div>
+                        <div class="value" id="statCanals">—</div>
+                        <div class="muted">Channels connected</div>
+                    </div>
+                    <div class="card">
+                        <div class="title">Transactions</div>
+                        <div class="value" id="statTxns">—</div>
+                        <div class="muted">Total (30d)</div>
+                    </div>
+                    <div class="card">
+                        <div class="title">Monthly Volume</div>
+                        <div class="value" id="statVolume">—</div>
+                        <div class="muted">Currency units</div>
+                    </div>
+                    <div class="card">
+                        <div class="title">API Success</div>
+                        <div class="value" id="statApiSuccess">—</div>
+                        <div class="muted">Requests succeeded</div>
+                    </div>
+                    <div class="card">
+                        <div class="title">API Errors</div>
+                        <div class="value" id="statApiErrors">—</div>
+                        <div class="muted">Requests failed</div>
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--gap);margin-top:var(--gap)">
+                    <div class="panel">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                            <h3 style="margin:0">Transactions by Agency</h3>
+                            <div class="muted">Monthly breakdown</div>
+                            <div class="right controls">
+                                <select id="overviewRange" onchange="ui.updateOverviewRange(this.value)">
+                                    <option value="30">Last 30 days</option>
+                                    <option value="7">Last 7 days</option>
+                                    <option value="1">Last 24 hours</option>
+                                </select>
+                            </div>
+                        </div>
+                        <canvas id="chartAgency" height="160"></canvas>
+                    </div>
+
+                    <div class="panel">
+                        <h3 style="margin-top:0">API Health</h3>
+                        <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
+                            <div>
+                                <div class="muted">Average latency</div>
+                                <div style="font-weight:700" id="apiLatency">— ms</div>
+                            </div>
+                            <div>
+                                <div class="muted">Error rate (30d)</div>
+                                <div style="font-weight:700" id="apiErrorRate">— %</div>
+                            </div>
+                            <div>
+                                <div class="muted">Top error endpoints</div>
+                                <ul id="topErrors" style="margin:8px 0 0 16px"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions -->
+            <div id="transactions" class="page" style="display:none">
+                <div style="display:flex;align-items:center;gap:12px;justify-content:space-between">
+                    <div>
+                        <h2 style="margin:0">Transaction Logs</h2>
+                        <div class="muted">Filter, inspect and troubleshoot transactions</div>
+                    </div>
+
+                    <div class="controls">
+                        <select id="txnStatusFilter" onchange="ui.applyTxnFilters()">
+                            <option value="">All statuses</option>
+                            <option value="success">Success</option>
+                            <option value="failed">Failed</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                        <select id="txnAgencyFilter" onchange="ui.applyTxnFilters()">
+                            <option value="">All agencies</option>
+                        </select>
+                        <input type="date" id="txnFrom" onchange="ui.applyTxnFilters()"/>
+                        <input type="date" id="txnTo" onchange="ui.applyTxnFilters()"/>
+                        <button class="btn ghost" onclick="ui.resetTxnFilters()">Reset</button>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top:12px">
+                    <table id="txnTable" class="table" aria-describedby="Transaction logs table">
+                        <thead>
+                        <tr>
+                            <th>Txn ID</th>
+                            <th>Agency</th>
+                            <th>User</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Time</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+                        <div class="muted" id="txnSummary">Showing 0 transactions</div>
+                        <div class="controls">
+                            <button class="btn ghost" onclick="ui.prevPage()">Prev</button>
+                            <button class="btn" onclick="ui.nextPage()">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Monitoring -->
+            <div id="api" class="page" style="display:none">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                    <div>
+                        <h2 style="margin:0">API Monitoring</h2>
+                        <div class="muted">Realtime and historical API metrics</div>
+                    </div>
+                    <div class="controls">
+                        <button class="btn ghost" onclick="ui.toggleStream()">Toggle Stream</button>
+                        <button class="btn" onclick="ui.openModal('simulateApi')">Simulate Error</button>
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-top:12px">
+                    <div class="panel">
+                        <h3 style="margin-top:0">Requests Over Time</h3>
+                        <canvas id="chartApiRequests" height="140"></canvas>
+                    </div>
+                    <div class="panel">
+                        <h3 style="margin-top:0">Top Endpoints</h3>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>Requests</th>
+                                <th>Error %</th>
+                            </tr>
+                            </thead>
+                            <tbody id="apiEndpoints"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="listAPI_Panel" class="panel" style="margin-top:var(--gap)">
+                    <div style="display:flex;align-items:center;gap:12px;justify-content:space-between">
+                        <div>
+                            <h2 style="margin:0">API Requests Logs</h2>
+                            <div class="muted">Filter, inspect and troubleshoot API Payloads</div>
+                        </div>
+
+                        <div class="controls">
+                            <select id="apiStatusFilter" onchange="ui.applyApiFilters()">
+                                <option value="">All statuses</option>
+                                <option value="success">Success</option>
+                                <option value="failed">Failed</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                            <input type="date" id="apiFrom" onchange="ui.applyApiFilters()"/>
+                            <input type="date" id="apiTo" onchange="ui.applyApiFilters()"/>
+                            <button class="btn ghost" onclick="ui.resetApiFilters()">Reset</button>
+                        </div>
+                    </div>
+                    <div class="panel" style="margin-top:12px">
+                        <table id="apiTable" class="table" aria-describedby="API logs table">
+                            <thead>
+                            <tr>
+                                <th>API ID</th>
+                                <th>User</th>
+                                <th>Payload</th>
+                                <th>Status</th>
+                                <th>Time</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+                            <div class="muted" id="apiSummary">Showing 0 requests</div>
+                            <div class="controls">
+                                <button class="btn ghost" onclick="ui.apiPrevPage()">Prev</button>
+                                <button class="btn" onclick="ui.apiNextPage()">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users & Roles -->
+            <div id="users" class="page" style="display:none">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                    <div>
+                        <h2 style="margin:0">Users & Roles</h2>
+                        <div class="muted">Manage users, roles and permissions</div>
+                    </div>
+                    <div class="controls">
+                        <button class="btn" onclick="ui.openModal('createRole')">+ New Role</button>
+                        <button class="btn ghost" onclick="ui.openModal('createUser')">+ New User</button>
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--gap);margin-top:12px">
+                    <div class="panel">
+                        <h3 style="margin-top:0">User List</h3>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="userTable"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="panel">
+                        <h3 style="margin-top:0">Roles</h3>
+                        <div id="roleList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audit Trails -->
+            <div id="audit" class="page" style="display:none">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                    <div>
+                        <h2 style="margin:0">Audit Trails</h2>
+                        <div class="muted">Immutable log of admin actions and system events</div>
+                    </div>
+                    <div class="controls">
+                        <select id="auditType" onchange="ui.applyAuditFilters()">
+                            <option value="">All events</option>
+                            <option value="user">User management</option>
+                            <option value="txn">Transaction</option>
+                            <option value="api">API</option>
+                            <option value="system">System</option>
+                        </select>
+                        <button class="btn ghost" onclick="ui.clearAuditFilters()">Reset</button>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top:12px">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Actor</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                        </tr>
+                        </thead>
+                        <tbody id="auditTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+    </main>
+</div>
+
+<!-- Modals -->
+<div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" id="modalContent" role="document">
+        <!-- dynamic content -->
+    </div>
+</div>
+
+<script>
+    /* ============================
+       Mock data and state
+       ============================ */
+    const state = {
+        users: [
+            {id: 1, name: 'John Doe', email: 'john@agency.com', role: 'Admin', lastLogin: '2026-02-28'},
+            {id: 2, name: 'Aisha Mbarga', email: 'aisha@agency.com', role: 'Operator', lastLogin: '2026-02-27'},
+            {id: 3, name: 'Paul N.', email: 'paul@agency.com', role: 'Viewer', lastLogin: '2026-02-20'}
+        ],
+        roles: [
+            {id: 'admin', name: 'Admin', permissions: ['users:crud', 'txns:all', 'api:manage']},
+            {id: 'operator', name: 'Operator', permissions: ['txns:create', 'txns:view']},
+            {id: 'viewer', name: 'Viewer', permissions: ['txns:view']}
+        ],
+        agencies: ['Agency A', 'Agency B', 'Agency C', 'Agency D'],
+        transactions: [],
+        audit: [],
+        apiMetrics: {
+            requests: Array.from({length: 30}, (_, i) => Math.floor(200 + Math.random() * 800)),
+            errors: Array.from({length: 30}, (_, i) => Math.floor(Math.random() * 20)),
+            endpoints: [
+                {path: '/v1/ussd/start', req: 12000, err: 1.2},
+                {path: '/v1/ussd/complete', req: 8000, err: 2.1},
+                {path: '/v1/auth', req: 4000, err: 0.5},
+                {path: '/v1/balance', req: 2000, err: 3.4}
+            ],
+            latency: 120
+        },
+        ui: {
+            txnPage: 0,
+            apiPage: 0,
+            pageSize: 8,
+            txnFilters: {status: '', agency: '', from: '', to: ''},
+            apiFilters: {status: '', from: '', to: ''},
+            stream: false
+        }
+    };
+
+    // generate mock transactions
+    (function genTxns() {
+        const statuses = ['success', 'failed', 'pending'];
+        for (let i = 0; i < 240; i++) {
+            const agency = state.agencies[Math.floor(Math.random() * state.agencies.length)];
+            const status = statuses[Math.floor(Math.random() * statuses.length)];
+            const amount = Math.floor(Math.random() * 5000) + 100;
+            const daysAgo = Math.floor(Math.random() * 30);
+            const time = new Date(Date.now() - daysAgo * 24 * 3600 * 1000 - Math.floor(Math.random() * 86400000));
+            state.transactions.push({
+                id: 'TXN' + (100000 + i),
+                agency,
+                user: state.users[Math.floor(Math.random() * state.users.length)].name,
+                amount,
+                status,
+                time: time.toISOString()
+            });
+        }
+    })();
+
+    /* ============================
+       UI helpers and rendering
+       ============================ */
+    const ui = {
+        init() {
+            this.cache();
+            this.bind();
+            this.renderAll();
+        },
+        cache() {
+            this.dom = {
+                pages: document.querySelectorAll('.page'),
+                navButtons: document.querySelectorAll('.nav button'),
+                statUsers: document.getElementById('statUsers'),
+                statCanals: document.getElementById('statCanals'),
+                statTxns: document.getElementById('statTxns'),
+                statApis: document.getElementById('statApis'),
+                statVolume: document.getElementById('statVolume'),
+                statApiSuccess: document.getElementById('statApiSuccess'),
+                statApiErrors: document.getElementById('statApiErrors'),
+                chartAgency: document.getElementById('chartAgency'),
+                apiLatency: document.getElementById('apiLatency'),
+                apiErrorRate: document.getElementById('apiErrorRate'),
+                topErrors: document.getElementById('topErrors'),
+                txnTableBody: document.querySelector('#txnTable tbody'),
+                apiTableBody: document.querySelector('#apiTable tbody'),
+                txnSummary: document.getElementById('txnSummary'),
+                apiSummary: document.getElementById('apiSummary'),
+                txnAgencyFilter: document.getElementById('txnAgencyFilter'),
+                userTable: document.getElementById('userTable'),
+                roleList: document.getElementById('roleList'),
+                auditTable: document.getElementById('auditTable'),
+                apiEndpoints: document.getElementById('apiEndpoints'),
+                chartApiRequests: document.getElementById('chartApiRequests'),
+                modalBackdrop: document.getElementById('modalBackdrop'),
+                modalContent: document.getElementById('modalContent'),
+                overviewRange: document.getElementById('overviewRange')
+            };
+        },
+        bind() {
+            // nav active state
+            document.querySelectorAll('.nav button').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+            // close modal on backdrop click
+            this.dom.modalBackdrop.addEventListener('click', (e) => {
+                if (e.target === this.dom.modalBackdrop) this.closeModal();
+            });
+        },
+        renderAll() {
+            this.renderStats();
+            this.renderOverviewChart();
+            this.renderTxnFilters();
+            this.renderTxns();
+            this.renderApiPanel();
+            this.renderApi();
+            this.renderUsers();
+            this.renderRoles();
+            this.renderAudit();
+        },
+
+        /* Sections */
+        showSection(id) {
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'block';
+        },
+
+        /* Search */
+        onSearch(q) {
+            q = q.trim().toLowerCase();
+            if (!q) {
+                this.renderTxns();
+                this.renderUsers();
+                return;
+            }
+            // simple search across txns and users
+            const txns = state.transactions.filter(t => t.id.toLowerCase().includes(q) || t.agency.toLowerCase().includes(q) || t.user.toLowerCase().includes(q));
+            const users = state.users.filter(u => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
+            this.renderTxns(txns);
+            this.renderUsers(users);
+        },
+
+        /* Overview */
+        renderStats() {
+            const usersCount = state.users.length;
+            const canals = state.agencies.length;
+            const txns = state.transactions.length;
+            const volume = state.transactions.reduce((s, t) => s + t.amount, 0);
+            const apiSuccess = Math.max(0, 100 - Math.round((state.apiMetrics.errors.reduce((a, b) => a + b, 0) / state.apiMetrics.requests.reduce((a, b) => a + b, 1)) * 100));
+            const apiErrors = 100 - apiSuccess;
+
+            this.dom.statUsers.textContent = usersCount;
+            this.dom.statCanals.textContent = canals;
+            this.dom.statTxns.textContent = txns.toLocaleString();
+            this.dom.statVolume.textContent = volume.toLocaleString();
+            this.dom.statApiSuccess.textContent = apiSuccess + '%';
+            this.dom.statApiErrors.textContent = apiErrors + '%';
+            this.dom.apiLatency.textContent = state.apiMetrics.latency + ' ms';
+            this.dom.apiErrorRate.textContent = apiErrors + ' %';
+
+            // top errors
+            this.dom.topErrors.innerHTML = '';
+            state.apiMetrics.endpoints.slice(0, 3).forEach(e => {
+                const li = document.createElement('li');
+                li.textContent = `${e.path} — ${e.err}%`;
+                this.dom.topErrors.appendChild(li);
+            });
+        },
+
+        renderOverviewChart(rangeDays = 30) {
+            const labels = Array.from({length: rangeDays}, (_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - (rangeDays - 1 - i));
+                return d.toLocaleDateString();
+            });
+            // aggregate by agency (mock)
+            const datasets = state.agencies.map((a, idx) => ({
+                label: a,
+                data: labels.map(() => Math.floor(50 + Math.random() * 400)),
+                backgroundColor: `hsl(${(idx * 60) % 360} 70% 55% / 0.8)`
+            }));
+
+            if (this._agencyChart) this._agencyChart.destroy();
+            this._agencyChart = new Chart(this.dom.chartAgency.getContext('2d'), {
+                type: 'bar',
+                data: {labels, datasets},
+                options: {
+                    responsive: true,
+                    plugins: {legend: {position: 'bottom'}},
+                    scales: {x: {stacked: true}, y: {stacked: true}}
+                }
+            });
+        },
+
+        updateOverviewRange(val) {
+            this.renderOverviewChart(Number(val));
+        },
+
+        /* API Panel */
+        renderApiPanel() {
+            // requests chart
+            const labels = Array.from({length: 30}, (_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - (29 - i));
+                return d.toLocaleDateString();
+            });
+            if (this._apiChart) this._apiChart.destroy();
+            this._apiChart = new Chart(this.dom.chartApiRequests.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Requests',
+                            data: state.apiMetrics.requests,
+                            borderColor: '#0ea5a4',
+                            backgroundColor: 'rgba(14,165,164,0.08)',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Errors',
+                            data: state.apiMetrics.errors,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239,68,68,0.06)',
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {responsive: true, plugins: {legend: {position: 'bottom'}}}
+            });
+
+            // endpoints table
+            this.dom.apiEndpoints.innerHTML = '';
+            state.apiMetrics.endpoints.forEach(e => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${e.path}</td><td>${e.req.toLocaleString()}</td><td>${e.err}%</td>`;
+                this.dom.apiEndpoints.appendChild(tr);
+            });
+        },
+
+        toggleStream() {
+            state.ui.stream = !state.ui.stream;
+            if (state.ui.stream) {
+                this._streamInterval = setInterval(() => {
+                    // simulate incoming metric
+                    const newReq = Math.floor(100 + Math.random() * 400);
+                    state.apiMetrics.requests.push(newReq);
+                    state.apiMetrics.requests.shift();
+                    state.apiMetrics.errors.push(Math.floor(Math.random() * 10));
+                    state.apiMetrics.errors.shift();
+                    this.renderApiPanel();
+                    this.renderStats();
+                }, 3000);
+            } else {
+                clearInterval(this._streamInterval);
+            }
+        },
+
+        simulateApiError() {
+            // add audit entry and bump errors
+            state.apiMetrics.errors[state.apiMetrics.errors.length - 1] += 5;
+            state.audit.unshift({
+                time: new Date().toISOString(),
+                actor: 'system',
+                action: 'Simulated API error',
+                details: 'Injected error for testing'
+            });
+            this.renderApiPanel();
+            this.renderAudit();
+            this.renderStats();
+        },
+
+        /* Transactions */
+        renderTxnFilters() {
+            // populate agency filter
+            this.dom.txnAgencyFilter.innerHTML = '<option value="">All agencies</option>';
+            state.agencies.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a;
+                opt.textContent = a;
+                this.dom.txnAgencyFilter.appendChild(opt);
+            });
+        },
+
+        applyTxnFilters() {
+            const status = document.getElementById('txnStatusFilter').value;
+            const agency = document.getElementById('txnAgencyFilter').value;
+            const from = document.getElementById('txnFrom').value;
+            const to = document.getElementById('txnTo').value;
+            state.ui.txnFilters = {status, agency, from, to};
+            state.ui.txnPage = 0;
+            this.renderTxns();
+        },
+
+        applyApiFilters() {
+            const status = document.getElementById('apiStatusFilter').value;
+            // const agency = document.getElementById('txnAgencyFilter').value;
+            const from = document.getElementById('apiFrom').value;
+            const to = document.getElementById('apiTo').value;
+            state.ui.txnFilters = {status, from, to};
+            state.ui.txnPage = 0;
+            this.renderTxns();
+        },
+
+        resetApiFilters() {
+            document.getElementById('apiStatusFilter').value = '';
+            document.getElementById('apiFrom').value = '';
+            document.getElementById('apiTo').value = '';
+            state.ui.txnFilters = {status: '', from: '', to: ''};
+            this.renderApi();
+        },
+
+        renderApi(list = null) {
+            const data = list || state.transactions.slice().sort((a, b) => new Date(b.time) - new Date(a.time));
+            // apply filters
+            const f = state.ui.apiFilters;
+            const filtered = data.filter(t => {
+                if (f.status && t.status !== f.status) return false;
+                if (f.from && new Date(t.time) < new Date(f.from)) return false;
+                return !(f.to && new Date(t.time) > new Date(f.to + 'T23:59:59'));
+            });
+
+            const start = state.ui.apiPage * state.ui.pageSize;
+            const page = filtered.slice(start, start + state.ui.pageSize);
+
+            this.dom.apiTableBody.innerHTML = '';
+            page.forEach(t => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+            <td class="nowrap">${t.id}</td>
+            <td>${t.user}</td>
+            <td>${t.amount.toLocaleString()}</td>
+            <td>${t.status}</td>
+            <td>${new Date(t.time).toLocaleString()}</td>
+            <td>
+              <button class="btn ghost" onclick="ui.inspectApi('${t.id}')">Inspect</button>
+              <button class="btn" onclick="ui.retryApi('${t.id}')">Retry</button>
+            </td>
+          `;
+                this.dom.apiTableBody.appendChild(tr);
+            });
+
+            this.dom.apiSummary.textContent = `Showing ${start + 1}-${Math.min(start + page.length, filtered.length)} of ${filtered.length} requests`;
+        },
+
+        resetTxnFilters() {
+            document.getElementById('txnStatusFilter').value = '';
+            document.getElementById('txnAgencyFilter').value = '';
+            document.getElementById('txnFrom').value = '';
+            document.getElementById('txnTo').value = '';
+            state.ui.txnFilters = {status: '', agency: '', from: '', to: ''};
+            this.renderTxns();
+        },
+
+        renderTxns(list = null) {
+            const data = list || state.transactions.slice().sort((a, b) => new Date(b.time) - new Date(a.time));
+            // apply filters
+            const f = state.ui.txnFilters;
+            const filtered = data.filter(t => {
+                if (f.status && t.status !== f.status) return false;
+                if (f.agency && t.agency !== f.agency) return false;
+                if (f.from && new Date(t.time) < new Date(f.from)) return false;
+                if (f.to && new Date(t.time) > new Date(f.to + 'T23:59:59')) return false;
+                return true;
+            });
+
+            const start = state.ui.txnPage * state.ui.pageSize;
+            const page = filtered.slice(start, start + state.ui.pageSize);
+
+            this.dom.txnTableBody.innerHTML = '';
+            page.forEach(t => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+            <td class="nowrap">${t.id}</td>
+            <td>${t.agency}</td>
+            <td>${t.user}</td>
+            <td>${t.amount.toLocaleString()}</td>
+            <td>${t.status}</td>
+            <td>${new Date(t.time).toLocaleString()}</td>
+            <td>
+              <button class="btn ghost" onclick="ui.inspectTxn('${t.id}')">Inspect</button>
+              <button class="btn" onclick="ui.retryTxn('${t.id}')">Retry</button>
+            </td>
+          `;
+                this.dom.txnTableBody.appendChild(tr);
+            });
+
+            this.dom.txnSummary.textContent = `Showing ${start + 1}-${Math.min(start + page.length, filtered.length)} of ${filtered.length} transactions`;
+        },
+
+        prevPage() {
+            if (state.ui.txnPage > 0) {
+                state.ui.txnPage--;
+                this.renderTxns();
+            }
+        },
+        nextPage() {
+            const maxPage = Math.floor((state.transactions.length - 1) / state.ui.pageSize);
+            if (state.ui.txnPage < maxPage) {
+                state.ui.txnPage++;
+                this.renderTxns();
+            }
+        },
+
+        apiPrevPage() {
+            if (state.ui.apiPage > 0) {
+                state.ui.apiPage--;
+                this.renderApi();
+            }
+        },
+        apiNextPage() {
+            const maxPage = Math.floor((state.transactions.length - 1) / state.ui.pageSize);
+            if (state.ui.apiPage < maxPage) {
+                state.ui.apiPage++;
+                this.renderApi();
+            }
+        },
+
+        inspectTxn(id) {
+            const txn = state.transactions.find(t => t.id === id);
+            if (!txn) return alert('Transaction not found');
+            this.openModal('txnInspect', txn);
+        },
+		
+		inspectApi(id) {
+            const api = state.transactions.find(t => t.id === id);
+            if (!api) return alert('Requests not found');
+            this.openModal('apiInspect', api);
+        },
+		
+		retryApi(id) {
+            // simulate retry and audit
+            const api = state.transactions.find(t => t.id === id);
+            if (!api) return;
+            api.status = 'success';
+            state.audit.unshift({
+                time: new Date().toISOString(),
+                actor: 'admin',
+                action: 'Retry API Request',
+                details: `Retried ${id}`
+            });
+            this.renderApi();
+            this.renderAudit();
+            this.renderStats();
+        },
+        
+		retryTxn(id) {
+            // simulate retry and audit
+            const txn = state.transactions.find(t => t.id === id);
+            if (!txn) return;
+            txn.status = 'success';
+            state.audit.unshift({
+                time: new Date().toISOString(),
+                actor: 'admin',
+                action: 'Retry transaction',
+                details: `Retried ${id}`
+            });
+            this.renderTxns();
+            this.renderAudit();
+            this.renderStats();
+        },
+
+        /* Users & Roles */
+        renderUsers(list = null) {
+            const data = list || state.users;
+            this.dom.userTable.innerHTML = '';
+            data.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${u.name}</td><td>${u.email}</td><td>${u.role}</td><td>${u.lastLogin}</td>
+            <td>
+              <button class="btn ghost" onclick="ui.openModal('editUser', ${u.id})">Edit</button>
+              <button class="btn danger" onclick="ui.deleteUser(${u.id})">Delete</button>
+            </td>`;
+                this.dom.userTable.appendChild(tr);
+            });
+        },
+
+        renderRoles() {
+            this.dom.roleList.innerHTML = '';
+            state.roles.forEach(r => {
+                const div = document.createElement('div');
+                div.style.marginBottom = '10px';
+                div.innerHTML = `<div style="display:flex;align-items:center;gap:8px">
+            <strong>${r.name}</strong>
+            <div class="muted" style="margin-left:8px">${r.permissions.join(', ')}</div>
+            <div class="right"><button class="btn ghost" onclick="ui.openModal('editRole','${r.id}')">Edit</button></div>
+          </div>`;
+                this.dom.roleList.appendChild(div);
+            });
+        },
+
+        createUser(payload) {
+            const id = state.users.length ? Math.max(...state.users.map(u => u.id)) + 1 : 1;
+            state.users.push({id, ...payload});
+            state.audit.unshift({
+                time: new Date().toISOString(),
+                actor: 'admin',
+                action: 'Create user',
+                details: payload.email
+            });
+            this.renderUsers();
+            this.renderAudit();
+            this.closeModal();
+        },
+
+        editUser(id, payload) {
+            const idx = state.users.findIndex(u => u.id === id);
+            if (idx >= 0) {
+                state.users[idx] = {...state.users[idx], ...payload};
+                state.audit.unshift({
+                    time: new Date().toISOString(),
+                    actor: 'admin',
+                    action: 'Edit user',
+                    details: state.users[idx].email
+                });
+            }
+            this.renderUsers();
+            this.renderAudit();
+            this.closeModal();
+        },
+
+        deleteUser(id) {
+            if (!confirm('Delete user? This action is irreversible.')) return;
+            const idx = state.users.findIndex(u => u.id === id);
+            if (idx >= 0) {
+                state.audit.unshift({
+                    time: new Date().toISOString(),
+                    actor: 'admin',
+                    action: 'Delete user',
+                    details: state.users[idx].email
+                });
+                state.users.splice(idx, 1);
+            }
+            this.renderUsers();
+            this.renderAudit();
+        },
+
+        createRole(payload) {
+            state.roles.push(payload);
+            state.audit.unshift({
+                time: new Date().toISOString(),
+                actor: 'admin',
+                action: 'Create role',
+                details: payload.name
+            });
+            this.renderRoles();
+            this.closeModal();
+        },
+
+        editRole(id, payload) {
+            const idx = state.roles.findIndex(r => r.id === id);
+            if (idx >= 0) {
+                state.roles[idx] = {...state.roles[idx], ...payload};
+                state.audit.unshift({
+                    time: new Date().toISOString(),
+                    actor: 'admin',
+                    action: 'Edit role',
+                    details: state.roles[idx].name
+                });
+            }
+            this.renderRoles();
+            this.renderAudit();
+            this.closeModal();
+        },
+
+        /* Audit */
+        renderAudit() {
+            this.dom.auditTable.innerHTML = '';
+            state.audit.slice(0, 200).forEach(a => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${new Date(a.time).toLocaleString()}</td><td>${a.actor}</td><td>${a.action}</td><td>${a.details}</td>`;
+                this.dom.auditTable.appendChild(tr);
+            });
+        },
+
+        applyAuditFilters() {
+            const t = document.getElementById('auditType').value;
+            const filtered = t ? state.audit.filter(a => a.action.toLowerCase().includes(t)) : state.audit;
+            this.dom.auditTable.innerHTML = '';
+            filtered.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${new Date(a.time).toLocaleString()}</td><td>${a.actor}</td><td>${a.action}</td><td>${a.details}</td>`;
+                this.dom.auditTable.appendChild(tr);
+            });
+        },
+
+        clearAuditFilters() {
+            document.getElementById('auditType').value = '';
+            this.renderAudit();
+        },
+
+        /* Modal management */
+        openModal(type, payload) {
+            const content = this.dom.modalContent;
+            content.innerHTML = '';
+            if (type === 'createUser') {
+                content.innerHTML = `
+            <h3>Create User</h3>
+            <div class="form-row"><input id="m_name" placeholder="Full name" /></div>
+            <div class="form-row"><input id="m_email" placeholder="Email" /></div>
+            <div class="form-row">
+              <select id="m_role">${state.roles.map(r => `<option value="${r.name}">${r.name}</option>`).join('')}</select>
+              <input id="m_password" placeholder="Temporary password" />
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+              <button class="btn ghost" onclick="ui.closeModal()">Cancel</button>
+              <button class="btn" onclick="ui._createUserFromModal()">Save</button>
+            </div>
+          `;
+            } else if (type === 'editUser') {
+                const user = state.users.find(u => u.id === payload);
+                if (!user) return alert('User not found');
+                content.innerHTML = `
+            <h3>Edit User</h3>
+            <div class="form-row"><input id="m_name" value="${user.name}" /></div>
+            <div class="form-row"><input id="m_email" value="${user.email}" /></div>
+            <div class="form-row">
+              <select id="m_role">${state.roles.map(r => `<option value="${r.name}" ${r.name === user.role ? 'selected' : ''}>${r.name}</option>`).join('')}</select>
+              <input id="m_password" placeholder="New password (optional)" />
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+              <button class="btn ghost" onclick="ui.closeModal()">Cancel</button>
+              <button class="btn" onclick="ui._editUserFromModal(${user.id})">Save</button>
+            </div>
+          `;
+            } else if (type === 'createRole') {
+                content.innerHTML = `
+            <h3>Create Role</h3>
+            <div class="form-row"><input id="m_role_name" placeholder="Role id (e.g. manager)" /></div>
+            <div class="form-row"><input id="m_role_label" placeholder="Role display name" /></div>
+            <div class="form-row"><input id="m_role_perms" placeholder="Permissions (comma separated)" /></div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+              <button class="btn ghost" onclick="ui.closeModal()">Cancel</button>
+              <button class="btn" onclick="ui._createRoleFromModal()">Create</button>
+            </div>
+          `;
+            } else if (type === 'txnInspect') {
+                const t = payload;
+                content.innerHTML = `
+            <h3>Transaction ${t.id}</h3>
+            <div class="muted">Agency: ${t.agency}</div>
+            <div style="margin-top:8px"><strong>Amount:</strong> ${t.amount.toLocaleString()}</div>
+            <div style="margin-top:8px"><strong>Status:</strong> ${t.status}</div>
+            <div style="margin-top:8px"><strong>Time:</strong> ${new Date(t.time).toLocaleString()}</div>
+            <div style="margin-top:12px"><strong>Raw payload</strong>
+              <pre style="background:#f8fafc;padding:10px;border-radius:8px;max-height:200px;overflow:auto">${JSON.stringify(t, null, 2)}</pre>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+              <button class="btn ghost" onclick="ui.closeModal()">Close</button>
+              <button class="btn" onclick="ui.retryTxn('${t.id}')">Retry</button>
+            </div>
+          `;
+            } else if (type === 'createTransaction') {
+                content.innerHTML = `
+            <h3>Create Transaction (dev)</h3>
+            <div class="form-row"><select id="m_txn_agency">${state.agencies.map(a => `<option>${a}</option>`).join('')}</select></div>
+            <div class="form-row"><input id="m_txn_user" placeholder="User name" /></div>
+            <div class="form-row"><input id="m_txn_amount" placeholder="Amount" type="number" /></div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+              <button class="btn ghost" onclick="ui.closeModal()">Cancel</button>
+              <button class="btn" onclick="ui._createTxnFromModal()">Create</button>
+            </div>
+          `;
+            } else if (type === 'simulateApi') {
+                content.innerHTML = `
+            <h3>Simulate API Error</h3>
+            <div class="muted">This will inject a test error into metrics and create an audit entry.</div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+              <button class="btn ghost" onclick="ui.closeModal()">Cancel</button>
+              <button class="btn danger" onclick="ui.simulateApiError(); ui.closeModal()">Inject</button>
+            </div>
+          `;
+            } else {
+                content.innerHTML = `<h3>Unknown modal</h3>`;
+            }
+
+            this.dom.modalBackdrop.style.display = 'flex';
+            this.dom.modalBackdrop.setAttribute('aria-hidden', 'false');
+        },
+
+        closeModal() {
+            this.dom.modalBackdrop.style.display = 'none';
+            this.dom.modalBackdrop.setAttribute('aria-hidden', 'true');
+            this.dom.modalContent.innerHTML = '';
+        },
+
+        /* Modal form handlers */
+        _createUserFromModal() {
+            const name = document.getElementById('m_name').value.trim();
+            const email = document.getElementById('m_email').value.trim();
+            const role = document.getElementById('m_role').value;
+            if (!name || !email) return alert('Name and email required');
+            this.createUser({name, email, role, lastLogin: new Date().toISOString().split('T')[0]});
+        },
+
+        _editUserFromModal(id) {
+            const name = document.getElementById('m_name').value.trim();
+            const email = document.getElementById('m_email').value.trim();
+            const role = document.getElementById('m_role').value;
+            this.editUser(id, {name, email, role});
+        },
+
+        _createRoleFromModal() {
+            const id = document.getElementById('m_role_name').value.trim();
+            const name = document.getElementById('m_role_label').value.trim();
+            const perms = document.getElementById('m_role_perms').value.split(',').map(s => s.trim()).filter(Boolean);
+            if (!id || !name) return alert('Role id and name required');
+            this.createRole({id, name, permissions: perms});
+        },
+
+        _createTxnFromModal() {
+            const agency = document.getElementById('m_txn_agency').value;
+            const user = document.getElementById('m_txn_user').value || 'system';
+            const amount = Number(document.getElementById('m_txn_amount').value) || 0;
+            const id = 'TXN' + (100000 + state.transactions.length + 1);
+            const txn = {id, agency, user, amount, status: 'success', time: new Date().toISOString()};
+            state.transactions.unshift(txn);
+            state.audit.unshift({
+                time: new Date().toISOString(),
+                actor: 'admin',
+                action: 'Create transaction',
+                details: id
+            });
+            this.renderTxns();
+            this.renderAudit();
+            this.renderStats();
+            this.closeModal();
+        }
+    };
+
+    // initialize UI after DOM loaded and Chart.js loaded
+    window.addEventListener('DOMContentLoaded', () => {
+        ui.init();
+        // default section
+        ui.showSection('overview');
+    });
+
+    // expose ui to global for inline handlers
+    window.ui = ui;
+</script>
+</body>
+</html>

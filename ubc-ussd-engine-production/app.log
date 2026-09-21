@@ -1,0 +1,13 @@
+INFO:     Will watch for changes in these directories: ['D:\\dEV\\ubc-ussd-engine']
+INFO:     Uvicorn running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:     Started reloader process [25876] using StatReload
+INFO:     Started server process [13388]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:56521 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56521 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56391 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61040 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59525 - "GET /admin HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53922 - "GET /admin HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53922 - "GET /admin HTTP/1.1" 404 Not Found

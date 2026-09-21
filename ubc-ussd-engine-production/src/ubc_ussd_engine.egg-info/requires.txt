@@ -1,0 +1,8 @@
+fastapi>=0.129.0
+multipart
+python-multipart
+uvicorn
+ldap3>=2.9.1
+setuptools>=77.0.0
+uvicorn
+jinja2

@@ -1,0 +1,84 @@
+### ERD
+===================================USSD_SUBSCRIBERS_DATABASE===========================================================
+- Linkage : link_id (PK), phone_number (UNIQUE), client_id, link_status, created_date, last_modified_date
+- Subscribers : subscriber_id (PK), link_id (FK[Linkage]), phone_number (UNIQUE), subscriber_ext_id, subscription_status, created_date, last_modified_date
+- Link_Bounding : bound_key (PK), link_id (FK[Linkage]), client_id, account_RIB (UNIQUE), bounding_status, created_date, last_modified_date
+- Linkage_PIN_Hashes : hash_id (PK), link_id (FK[Linkage], NOT NULL), PIN, pin_hash, hash_status, created_date, validity_date
+- Transactions_Events : event_id (PK), debitor_account_RIB, creditor_account_RIB, trans_amount, trans_status, debitor_bal_b4, creditor_bal_b4, debitor_bal_af, creditor_bal_af, trans_motif, trans_sys_date, trans_exec_date, trans_val_date
+- Transactions_Journal : journal_id, event_id (FK[Transactions_Events]), link_id(FK[Linkage]), phone_number, account_RIB, trans_amount, trans_direction, trans_motif, trans_exec_date, trans_val_date, journal_date, reconciliation_date, reconciliation_flag, journal_view_flag
+
+
+
+### Workflows
+
+1. New USSD Subscribers
+    1.1 - Insert New Subscriber in "Subscriber" Database
+            a- Create a unique Linkage between customer's phone number, client ID and client's accounts where the phone number is UNIQUE in the Linkage table.
+                > --- CHECK IF EXISTING
+                > SELECT * FROM LINKAGE WHERE PHONE_NUMBER = '6XXXXXXXX';  -- 0 rows
+                > SELECT * FROM SUBSCRIBERS WHERE PHONE_NUMBER = '6XXXXXXXX';  -- 0 rows
+                > SELECT * FROM LINK_BOUNDING WHERE LINK_ID = (SELECT LINKD_ID FROM LINKAGE WHERE PHONE_NUMBER = '6XXXXXXXX';);  -- 0 rows
+				
+				
+				> --- IF EXISTING THEN
+				> SELECT 
+				> 	l.link_id,
+				> 	l.phone_number AS linkage_phone,
+				> 	l.client_id,
+				> 	l.link_status,
+				> 	l.created_date AS linkage_created,
+				> 	s.subscriber_id,
+				> 	s.phone_number AS subscriber_phone,
+				> 	s.subscriber_ext_id,
+				> 	s.subscription_status,
+				> 	b.bound_key,
+				> 	b.account_RIB,
+				> 	b.bounding_status,
+				> 	h.hash_id,
+				> 	h.pin_hash,
+				> 	h.hash_status,
+				> 	h.validity_date
+				> FROM Linkage l
+				> INNER JOIN Subscribers s 
+				> 	ON l.link_id = s.link_id
+				> INNER JOIN Link_Bounding b 
+				> 	ON l.link_id = b.link_id
+				> INNER JOIN Linkage_PIN_Hashes h 
+				> 	ON l.link_id = h.link_id
+				> WHERE l.phone_number = '6XXXXXXXX' OR s.phone_number = '6XXXXXXXX';
+
+
+				> --- IF WANNA DELETE EXISTING THEN
+				> DELETE FROM LINK_BOUNDING WHERE LINK_ID = (SELECT LINKD_ID FROM LINKAGE WHERE PHONE_NUMBER = '6XXXXXXXX';);  -- X rows
+				> DELETE FROM SUBSCRIBERS WHERE PHONE_NUMBER = '6XXXXXXXX';  -- 1 rows
+				> DELETE FROM LINKAGE WHERE PHONE_NUMBER = '6XXXXXXXX';  -- 1 rows
+				> 
+				> -- Delete PIN hashes
+				> DELETE FROM Linkage_PIN_Hashes
+				> WHERE link_id = (
+				> 	SELECT link_id FROM Linkage WHERE phone_number = '6XXXXXXXX'
+				> );
+				> 
+				> -- Delete bounding records
+				> DELETE FROM Link_Bounding
+				> WHERE link_id = (
+				> 	SELECT link_id FROM Linkage WHERE phone_number = '6XXXXXXXX'
+				> );
+				> 
+				> -- Delete subscribers
+				> DELETE FROM Subscribers
+				> WHERE link_id = (
+				> 	SELECT link_id FROM Linkage WHERE phone_number = '6XXXXXXXX'
+				> );
+				> 
+				> -- Finally delete linkage
+				> DELETE FROM Linkage
+				> WHERE phone_number = '6XXXXXXXX';
+				
+				
+                > --- ELSE INSERT NEW SUBSCRIBER
+                > INSERT INTO LINKAGE VALUES (AUTO, '6XXXXXXXX', 'XXXXXXXX', 0/1/2, SYSDATE('DD-MMM-YYYY'), SYSDATE('DD-MMM-YYYY'));
+				> INSERT INTO SUBSCRIBERS VALUES (AUTO, 'XX...XX', 'XXXXXXXX', '6XXXXXXXX', 'XX...XX', 0/1/2, SYSDATE('DD-MMM-YYYY'), SYSDATE('DD-MMM-YYYY'))
+				> INSERT INTO LINK_BOUNDING VALUES (AUTO, 'XX...XX', 'XXXXXXXX', 'XXXXX-XXXXXXXXXXX-XX', 0/1/2, SYSDATE('DD-MMM-YYYY'), SYSDATE('DD-MMM-YYYY'))
+
+            b- 

@@ -1,0 +1,31 @@
+[project]
+name = "ubc-ussd-engine"
+version = "0.1.0"
+description = "A USSD application for banking and other payment services."
+readme = "README.md"
+#license-files = ["0BSD", "MIT"]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.129.0",
+    "multipart",
+    "python-multipart",
+    "uvicorn",
+    "ldap3>=2.9.1",
+    "setuptools>=77.0.0",
+    "uvicorn",
+    "jinja2"
+#    "python-ldap>=3.0.0",
+]
+
+[dependency-groups]
+test = [
+    "fastapi[standard]",
+    "pytest",
+]
+
+[build-system]
+requires = ["setuptools>=77.0.0", "wheel", "uv"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "app/_version.py"

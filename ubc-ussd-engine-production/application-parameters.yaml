@@ -1,0 +1,212 @@
+# application-parameters.yaml - sensible defaults (change secrets before production)
+
+app:
+  name: ussd-engine
+  version: 0.1.0
+  description: Default application parameters
+  env: development
+  debug: true
+  compatibility: ">=3.8"
+  compatibility_notes: "Ensure Python 3.8 or higher is used. Some features may require additional dependencies."
+  organization: Union Bank Cameroon
+  contact_email: admin@unionbankcameroon.com
+
+core:
+  secret_key: null                # set via environment in production
+  allowed_hosts:
+    - localhost
+    - 127.0.0.1
+    - ussd.unionbankcameroon.com
+
+server:
+  host: 0.0.0.0
+  port: 8000
+  protocol: http
+  workers: 4
+  graceful_shutdown_seconds: 30
+  keepalive_seconds: 5
+
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  console: true
+  file: null                      # path to enable file logging
+  rotation:
+    max_bytes: 10485760
+    backup_count: 5
+
+database:
+  engine: sqlite                  # options: sqlite, postgres, mysql
+  sqlite:
+    path: ./data/db.sqlite3
+  postgres:
+    host: localhost
+    port: 5432
+    name: app_db
+    user: app_user
+    password: null
+    ssl: false
+  pool:
+    min_size: 1
+    max_size: 10
+    max_overflow: 5
+
+cache:
+  backend: local                  # options: local, redis, memcached
+  ttl_seconds: 300
+  local:
+    path: ./cache
+
+redis:
+  enabled: false
+  host: localhost
+  port: 6379
+  db: 0
+  password: null
+
+broker:
+  url: redis://localhost:6379/1
+
+celery:
+  enabled: false
+  broker_url: redis://localhost:6379/1
+  result_backend: redis://localhost:6379/2
+  task_default_queue: default
+  task_serializer: json
+  accept_content:
+    - json
+  task_routes: {}
+
+storage:
+  local:
+    uploads_dir: ./uploads
+    temp_dir: ./tmp
+  s3:
+    enabled: false
+    bucket: my-bucket
+    region: us-east-1
+    access_key: null
+    secret_key: null
+
+email:
+  backend: SMTP                    # options: SMTP, console, mailgun
+  configuration:
+    host: unionbankcameroon-com.protect.outlook.com
+    port: 25
+    user: no-reply@unionbankcameroon.com
+    password: Change-me-2026
+    use_tls: true
+    from_address: no-reply@unionbankcameroon.com
+
+auth:
+  jwt:
+    enabled: true
+    secret: null
+    algorithm: HS256
+    expire_minutes: 60
+    refresh_expire_days: 7
+  password_policy:
+    min_length: 8
+    require_numbers: true
+    require_uppercase: false
+    require_special: false
+  oauth:
+    providers: {}
+
+cors:
+  allowed_origins:
+    - http://localhost:3000
+    - http://127.0.0.1:3000
+  allow_credentials: true
+  allow_methods:
+    - GET
+    - POST
+    - PUT
+    - PATCH
+    - DELETE
+    - OPTIONS
+  allow_headers:
+    - Authorization
+    - Content-Type
+    - X-Requested-With
+
+features:
+  enable_signup: true
+  enable_email_verification: false
+  enable_rate_limiting: true
+  maintenance_mode: false
+
+limits:
+  request_size_mb: 10
+  max_concurrent_requests: 100
+  rate_limit_per_minute: 60
+
+timeouts:
+  request_seconds: 30
+  db_seconds: 30
+  external_service_seconds: 10
+
+retries:
+  max_attempts: 3
+  backoff_seconds: 2
+  jitter: true
+
+workers:
+  background_jobs: 2
+  max_threads: 8
+
+observability:
+  metrics:
+    enabled: true
+    endpoint: /metrics
+  tracing:
+    enabled: false
+    provider: jaeger
+    endpoint: http://localhost:14268/api/traces
+
+security:
+  csrf_enabled: true
+  hsts_seconds: 31536000
+  content_security_policy: "default-src 'self'"
+  secure_cookies: false
+  allowed_file_extensions:
+    - .jpg
+    - .png
+    - .pdf
+
+health_check:
+  path: /health
+  timeout_seconds: 5
+  check_database: true
+  check_redis: false
+
+i18n:
+  default_locale: en
+  supported_locales:
+    - en
+    - fr
+    - es
+
+backups:
+  enabled: false
+  schedule: "0 2 * * *"            # daily at 02:00
+  retention_days: 7
+  destination: ./backups
+
+maintenance:
+  enabled: false
+  message: "Service is temporarily unavailable for maintenance."
+
+paths:
+  static_dir: ./static
+  templates_dir: ./templates
+  log_dir: ./logs
+  data_dir: ./data
+  database_dir: ./database
+  temp_dir: ./tmp
+  archives_dir: ./archives
+  bin_dir: ./bin
+
+notes:
+  - Replace all `null` and `change-me` placeholders with secure values or environment overrides.
+  - Do not store production secrets in the repository; use environment-specific config or secret manager.
